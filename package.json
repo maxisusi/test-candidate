@@ -14,7 +14,9 @@
     "postcss": "^8.4.31"
   },
   "scripts": {
-    "start": "BROWSER=none WDS_SOCKET_PORT=0 vite --port 3000",
+    "start": "sh -c 'php -S 0.0.0.0:8000 -t ./backend/public > /tmp/symfony.log 2>&1 & BROWSER=none WDS_SOCKET_PORT=0 vite --port 3000'",
+    "stop": "sh -c 'fuser -k 8000/tcp || true; fuser -k 3000/tcp || true'",
+    "restart": "npm run stop && npm run start",
     "build": "vite build",
     "preview": "vite preview"
   },

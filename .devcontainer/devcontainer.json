@@ -3,12 +3,12 @@
   "hostRequirements": {
     "cpus": 4
   },
-  "waitFor": "onCreateCommand",
-  "onCreateCommand": "sudo apt-get update && sudo apt-get install -y just",
-  "updateContentCommand": "npm install",
+  "waitFor": "updateContentCommand",
+  "onCreateCommand": "",
+  "updateContentCommand": "bash .devcontainer/bootstrap.sh",
   "postCreateCommand": "",
   "postAttachCommand": {
-    "server": "just start"
+    "server": "npm run start"
   },
   "customizations": {
     "codespaces": {
