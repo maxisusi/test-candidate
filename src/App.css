@@ -29,3 +29,50 @@
 .small {
   font-size: 0.75rem;
 }
+
+.api-box {
+  margin-top: 1.5rem;
+  padding: 1.5rem 2rem;
+  border: 2px solid #61dafb;
+  border-radius: 12px;
+  background: rgba(97, 218, 251, 0.08);
+  font-size: 1rem;
+  min-width: 320px;
+}
+
+.api-box h2 {
+  margin-top: 0;
+  color: #61dafb;
+  font-size: 1.2rem;
+}
+
+.api-box ul {
+  list-style: none;
+  padding: 0;
+  text-align: left;
+}
+
+.api-box li {
+  margin: 0.3rem 0;
+}
+
+.api-box button {
+  margin-top: 1rem;
+  padding: 0.4rem 1.2rem;
+  background: #61dafb;
+  color: #282c34;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.api-box button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.error {
+  color: #ff6b6b;
+}
