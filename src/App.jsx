@@ -38,11 +38,32 @@ function App() {
           {loading && <p>Loading…</p>}
           {error && <p className="error">Error: {error}</p>}
           {apiData && (
-            <ul>
-              <li><strong>Message:</strong> {apiData.message}</li>
-              <li><strong>Symfony version:</strong> {apiData.version}</li>
-              <li><strong>Timestamp:</strong> {apiData.timestamp}</li>
-            </ul>
+            <>
+              <ul>
+                <li><strong>Message:</strong> {apiData.message}</li>
+                <li><strong>Symfony version:</strong> {apiData.version}</li>
+                <li><strong>Timestamp:</strong> {apiData.timestamp}</li>
+              </ul>
+              <h3>Products from DB</h3>
+              <table style={{width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem'}}>
+                <thead>
+                  <tr>
+                    <th style={{textAlign: 'left', borderBottom: '1px solid #61dafb', paddingBottom: '0.3rem'}}>ID</th>
+                    <th style={{textAlign: 'left', borderBottom: '1px solid #61dafb', paddingBottom: '0.3rem'}}>Name</th>
+                    <th style={{textAlign: 'right', borderBottom: '1px solid #61dafb', paddingBottom: '0.3rem'}}>Price</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {apiData.products.map(p => (
+                    <tr key={p.id}>
+                      <td style={{padding: '0.2rem 0'}}>{p.id}</td>
+                      <td>{p.name}</td>
+                      <td style={{textAlign: 'right'}}>${p.price}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </>
           )}
           <button onClick={fetchFromSymfony} disabled={loading}>
             Refresh
