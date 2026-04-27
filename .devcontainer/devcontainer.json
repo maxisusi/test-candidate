@@ -4,15 +4,16 @@
     "cpus": 4
   },
   "waitFor": "onCreateCommand",
+  "onCreateCommand": "sudo apt-get update && sudo apt-get install -y just",
   "updateContentCommand": "npm install",
   "postCreateCommand": "",
   "postAttachCommand": {
-    "server": "npm start"
+    "server": "just start"
   },
   "customizations": {
     "codespaces": {
       "openFiles": [
-        "src/App.jsx"
+        "src/App.tsx"
       ]
     }
   },
@@ -20,7 +21,11 @@
     "3000": {
       "label": "Application",
       "onAutoForward": "openPreview"
+    },
+    "8000": {
+      "label": "Symfony Backend",
+      "onAutoForward": "openPreview"
     }
   },
-  "forwardPorts": [3000]
+  "forwardPorts": [3000, 8000]
 }

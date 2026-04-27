@@ -1,21 +1,34 @@
 import { useEffect, useState } from 'react';
 import './App.css';
 
+type Product = {
+  id: number;
+  name: string;
+  price: number;
+};
+
+type ApiResponse = {
+  message: string;
+  version: string;
+  timestamp: string;
+  products: Product[];
+};
+
 function App() {
-  const [apiData, setApiData] = useState(null);
-  const [error, setError] = useState(null);
+  const [apiData, setApiData] = useState<ApiResponse | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const fetchFromSymfony = async () => {
+  const fetchFromSymfony = async (): Promise<void> => {
     setLoading(true);
     setError(null);
     try {
       const response = await fetch('/api/hello');
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      const data = await response.json();
+      const data: ApiResponse = await response.json();
       setApiData(data);
-    } catch (err) {
-      setError(err.message);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Unexpected error');
     } finally {
       setLoading(false);
     }
@@ -54,7 +67,7 @@ function App() {
                   </tr>
                 </thead>
                 <tbody>
-                  {apiData.products.map(p => (
+                  {apiData.products.map((p) => (
                     <tr key={p.id}>
                       <td style={{padding: '0.2rem 0'}}>{p.id}</td>
                       <td>{p.name}</td>
