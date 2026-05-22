@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import './App.css';
+import Directory from './Directory';
 
 type Product = {
   id: number;
@@ -82,6 +83,8 @@ function App() {
             Refresh
           </button>
         </div>
+
+        <Directory />
       </header>
     </div>
   );
