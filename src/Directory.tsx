@@ -44,6 +44,7 @@ function Directory() {
   return (
     <div className="api-box">
       <h2>Annuaire</h2>
+
       <input
         type="search"
         placeholder="Rechercher un employé…"

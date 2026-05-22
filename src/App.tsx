@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import './App.css';
 import Directory from './Directory';
+import Statistique from './Statistique';
 
 type Product = {
   id: number;
@@ -83,8 +84,9 @@ function App() {
             Refresh
           </button>
         </div>
-
+        
         <Directory />
+        <Statistique />
       </header>
     </div>
   );

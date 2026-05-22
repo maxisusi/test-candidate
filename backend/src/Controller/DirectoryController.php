@@ -35,4 +35,10 @@ class DirectoryController extends AbstractController
 
         return new JsonResponse($result);
     }
+
+    #[Route('/api/directory/stats', methods: ['GET'])]
+    public function stats(EmployeeRepository $repo): JsonResponse
+    {
+        return new JsonResponse([]);
+    }
 }
