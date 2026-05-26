@@ -14,6 +14,7 @@ export const translation = {
   directory: {
     title: 'Annuaire',
     searchPlaceholder: 'Rechercher un employé…',
+    pinMeToTop: 'Épingler en haut',
     columns: {
       id: 'ID',
       firstName: 'Prénom',

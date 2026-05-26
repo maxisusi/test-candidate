@@ -11,9 +11,19 @@ import { translation } from '../translations/translation';
 const DEBOUNCE_DELAY_MS = 250;
 const SKELETON_ROWS = 6;
 
+// The currently authenticated user
+const CURRENT_USER: Employee = {
+  id: 4,
+  firstName: 'David',
+  lastName: 'Schmidt',
+  department: 'Sales',
+  manager: null,
+};
+
 export const Directory = () => {
   const t = translation.directory;
   const [search, setSearch] = useState('');
+  const [pinMeToTop, setPinMeToTop] = useState(false);
   const debouncedSearch = useDebounceValue(search, DEBOUNCE_DELAY_MS);
 
   const {
@@ -26,6 +36,10 @@ export const Directory = () => {
     placeholderData: (previousData) => previousData,
   });
 
+  const displayedEmployees = pinMeToTop
+    ? [CURRENT_USER, ...employees]
+    : employees;
+
   return (
     <Card>
       <CardTitle>{t.title}</CardTitle>
@@ -36,6 +50,15 @@ export const Directory = () => {
         value={search}
         onChange={(e) => setSearch(e.target.value)}
       />
+
+      <CheckboxLabel>
+        <input
+          type="checkbox"
+          checked={pinMeToTop}
+          onChange={(e) => setPinMeToTop(e.target.checked)}
+        />
+        {t.pinMeToTop} ({CURRENT_USER.firstName} {CURRENT_USER.lastName})
+      </CheckboxLabel>
 
       {error && <ErrorText>{translation.common.errorPrefix} {error.message}</ErrorText>}
 
@@ -58,8 +81,8 @@ export const Directory = () => {
                   ))}
                 </tr>
               ))
-            : employees.length > 0
-              ? employees.map((e) => (
+            : displayedEmployees.length > 0
+              ? displayedEmployees.map((e) => (
                   <DataRow key={e.id}>
                     <Cell>{e.id}</Cell>
                     <Cell>{e.firstName}</Cell>
@@ -101,6 +124,23 @@ const SearchInput = styled.input`
   &:focus {
     border-color: #2563eb;
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+  }
+`;
+
+const CheckboxLabel = styled.label`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: #475569;
+  margin-bottom: 1.25rem;
+  cursor: pointer;
+
+  input[type='checkbox'] {
+    accent-color: #2563eb;
+    width: 1rem;
+    height: 1rem;
+    cursor: pointer;
   }
 `;
 

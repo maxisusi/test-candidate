@@ -7,13 +7,17 @@ import { translation } from './translations/translation';
 export const App = () => (
   <Layout>
     <NavBar>
-      <Inner>
+      <NavInner>
         <AppTitle>{translation.app.title}</AppTitle>
         <TabList>
           <TabLink to="/" end>{translation.app.tabs.directory}</TabLink>
           <TabLink to="/stats">{translation.app.tabs.statistics}</TabLink>
         </TabList>
-      </Inner>
+        <UserInfo>
+          <Avatar>D</Avatar>
+          <UserName>David</UserName>
+        </UserInfo>
+      </NavInner>
     </NavBar>
     <Main>
       <Inner>
@@ -37,6 +41,15 @@ const NavBar = styled.header`
   background: #ffffff;
   border-bottom: 1px solid #e2e8f0;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+`;
+
+const NavInner = styled.div`
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 `;
 
 const Inner = styled.div`
@@ -80,6 +93,31 @@ const TabLink = styled(NavLink)`
 
 const Main = styled.main`
   padding: 2rem 0;
+`;
+
+const UserInfo = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+`;
+
+const Avatar = styled.div`
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background: #2563eb;
+  color: #ffffff;
+  font-size: 0.85rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const UserName = styled.span`
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #1e293b;
 `;
 
 
