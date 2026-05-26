@@ -1,12 +1,13 @@
 import axios from 'axios';
-import type { DepartmentStat, Employee } from './types';
+import type { DepartmentStat } from './types';
+import type { RawEmployee } from './adapters';
 
 export const directory = {
-  getAll: async (search?: string): Promise<Employee[]> => {
+  getAll: async (search?: string): Promise<RawEmployee[]> => {
     const url = search
       ? `/api/directory?search=${encodeURIComponent(search)}`
       : '/api/directory';
-    const { data } = await axios.get<Employee[]>(url);
+    const { data } = await axios.get<RawEmployee[]>(url);
     return data;
   },
 };

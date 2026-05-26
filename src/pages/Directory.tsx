@@ -1,8 +1,10 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import styled from 'styled-components';
+import { adaptEmployees } from '../api/adapters';
 import { directory } from '../api/services';
 import type { Employee } from '../api/types';
+import type { RawEmployee } from '../api/adapters';
 import SkeletonBar from '../components/Skeleton';
 import { Card, CardTitle, HeaderCell, Cell, DataRow, EmptyCell } from '../components/Table';
 import { useDebounceValue } from '../hooks/useDebounceValue';
@@ -30,15 +32,19 @@ export const Directory = () => {
     data: employees = [],
     error,
     isLoading,
-  } = useQuery<Employee[], Error>({
+  } = useQuery<RawEmployee[], Error>({
     queryKey: ['directory', debouncedSearch],
     queryFn: () => directory.getAll(debouncedSearch || undefined),
-    placeholderData: (previousData) => previousData,
   });
 
+  const adaptedEmployees = useMemo<Employee[]>(
+    () => adaptEmployees(employees),
+    [employees]
+  );
+
   const displayedEmployees = pinMeToTop
-    ? [CURRENT_USER, ...employees]
-    : employees;
+    ? [CURRENT_USER, ...adaptedEmployees]
+    : adaptedEmployees;
 
   return (
     <Card>
