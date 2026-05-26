@@ -1,96 +1,84 @@
-import { useQuery } from '@tanstack/react-query';
+import { NavLink, Route, Routes } from 'react-router-dom';
 import styled from 'styled-components';
-import './App.css';
-import Directory from './Directory';
-import Statistique from './Statistique';
-import { hello } from './api/services';
-import type { HelloResponse } from './api/types';
+import { Directory } from './Directory';
+import { Statistique } from './Statistique';
 
-const App = () => {
-  const {
-    data: apiData,
-    error,
-    isFetching,
-    refetch,
-  } = useQuery<HelloResponse, Error>({
-    queryKey: ['api-hello'],
-    queryFn: hello.get,
-  });
+export const App = () => (
+  <Layout>
+    <NavBar>
+      <Inner>
+        <AppTitle>Annuaire RH</AppTitle>
+        <TabList>
+          <TabLink to="/" end>Annuaire</TabLink>
+          <TabLink to="/stats">Statistiques</TabLink>
+        </TabList>
+      </Inner>
+    </NavBar>
+    <Main>
+      <Inner>
+        <Routes>
+          <Route path="/" element={<Directory />} />
+          <Route path="/stats" element={<Statistique />} />
+        </Routes>
+      </Inner>
+    </Main>
+  </Layout>
+);
 
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src="Octocat.png" className="App-logo" alt="logo" />
-        <p>
-          GitHub Codespaces <span className="heart">♥️</span> React + Symfony
-        </p>
+const Layout = styled.div`
+  min-height: 100vh;
+  background-color: #f1f5f9;
+  color: #1e293b;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+`;
 
-        <div className="api-box">
-          <h2>Symfony API Response</h2>
-          {isFetching && <p>Loading…</p>}
-          {error && <p className="error">Error: {error.message}</p>}
-          {apiData && (
-            <>
-              <ul>
-                <li><strong>Message:</strong> {apiData.message}</li>
-                <li><strong>Symfony version:</strong> {apiData.version}</li>
-                <li><strong>Timestamp:</strong> {apiData.timestamp}</li>
-              </ul>
-              <h3>Products from DB</h3>
-              <DataTable>
-                <thead>
-                  <tr>
-                    <HeaderCell>ID</HeaderCell>
-                    <HeaderCell>Name</HeaderCell>
-                    <HeaderCellRight>Price</HeaderCellRight>
-                  </tr>
-                </thead>
-                <tbody>
-                  {apiData.products.map((p) => (
-                    <tr key={p.id}>
-                      <Cell>{p.id}</Cell>
-                      <Cell>{p.name}</Cell>
-                      <CellRight>${p.price}</CellRight>
-                    </tr>
-                  ))}
-                </tbody>
-              </DataTable>
-            </>
-          )}
-          <button onClick={() => refetch()} disabled={isFetching}>
-            Refresh
-          </button>
-        </div>
-        
-        <Directory />
-        <Statistique />
-      </header>
-    </div>
-  );
-};
+const NavBar = styled.header`
+  background: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+`;
 
-const DataTable = styled.table`
-  width: 100%;
-  border-collapse: collapse;
+const Inner = styled.div`
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+`;
+
+const AppTitle = styled.span`
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-right: 2rem;
+`;
+
+const TabList = styled.div`
+  display: inline-flex;
+  gap: 0.25rem;
+`;
+
+const TabLink = styled(NavLink)`
+  display: inline-block;
+  padding: 1rem 1.25rem;
+  text-decoration: none;
+  color: #64748b;
   font-size: 0.9rem;
+  font-weight: 500;
+  border-bottom: 2px solid transparent;
+  transition: color 0.15s, border-color 0.15s;
+
+  &:hover {
+    color: #1e293b;
+  }
+
+  &.active {
+    color: #2563eb;
+    border-bottom-color: #2563eb;
+    font-weight: 600;
+  }
 `;
 
-const HeaderCell = styled.th`
-  text-align: left;
-  border-bottom: 1px solid #61dafb;
-  padding-bottom: 0.3rem;
+const Main = styled.main`
+  padding: 2rem 0;
 `;
 
-const HeaderCellRight = styled(HeaderCell)`
-  text-align: right;
-`;
 
-const Cell = styled.td`
-  padding: 0.2rem 0;
-`;
-
-const CellRight = styled(Cell)`
-  text-align: right;
-`;
-
-export default App;

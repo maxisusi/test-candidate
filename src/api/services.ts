@@ -1,12 +1,5 @@
 import axios from 'axios';
-import type { DepartmentStat, Employee, HelloResponse } from './types';
-
-export const hello = {
-  get: async (): Promise<HelloResponse> => {
-    const { data } = await axios.get<HelloResponse>('/api/hello');
-    return data;
-  },
-};
+import type { DepartmentStat, Employee } from './types';
 
 export const directory = {
   getAll: async (search?: string): Promise<Employee[]> => {
