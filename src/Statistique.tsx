@@ -1,11 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
-import axios from 'axios';
 import styled from 'styled-components';
-
-type DepartmentStat = {
-  department: string;
-  count: number;
-};
+import { department } from './api/services';
+import type { DepartmentStat } from './api/types';
 
 const Statistique = () => {
   const {
@@ -13,10 +9,7 @@ const Statistique = () => {
     isFetching,
   } = useQuery<DepartmentStat[]>({
     queryKey: ['directory-stats'],
-    queryFn: async () => {
-      const { data } = await axios.get<DepartmentStat[]>('/api/directory/stats');
-      return data;
-    },
+    queryFn: department.getStats,
   });
 
   return (

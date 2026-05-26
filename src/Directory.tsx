@@ -1,15 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import axios from 'axios';
 import styled from 'styled-components';
-
-type Employee = {
-  id: number;
-  firstName: string;
-  lastName: string;
-  department: string;
-  manager: string | null;
-};
+import { directory } from './api/services';
+import type { Employee } from './api/types';
 
 const Directory = () => {
   const [search, setSearch] = useState('');
@@ -31,13 +24,7 @@ const Directory = () => {
     isFetching,
   } = useQuery<Employee[], Error>({
     queryKey: ['directory', debouncedSearch],
-    queryFn: async () => {
-      const url = debouncedSearch
-        ? `/api/directory?search=${encodeURIComponent(debouncedSearch)}`
-        : '/api/directory';
-      const { data } = await axios.get<Employee[]>(url);
-      return data;
-    },
+    queryFn: () => directory.getAll(debouncedSearch || undefined),
     placeholderData: (previousData) => previousData,
   });
 

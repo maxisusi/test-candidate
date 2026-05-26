@@ -1,22 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
-import axios from 'axios';
 import styled from 'styled-components';
 import './App.css';
 import Directory from './Directory';
 import Statistique from './Statistique';
-
-type Product = {
-  id: number;
-  name: string;
-  price: number;
-};
-
-type ApiResponse = {
-  message: string;
-  version: string;
-  timestamp: string;
-  products: Product[];
-};
+import { hello } from './api/services';
+import type { HelloResponse } from './api/types';
 
 const App = () => {
   const {
@@ -24,12 +12,9 @@ const App = () => {
     error,
     isFetching,
     refetch,
-  } = useQuery<ApiResponse, Error>({
+  } = useQuery<HelloResponse, Error>({
     queryKey: ['api-hello'],
-    queryFn: async () => {
-      const { data } = await axios.get<ApiResponse>('/api/hello');
-      return data;
-    },
+    queryFn: hello.get,
   });
 
   return (
