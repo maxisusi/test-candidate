@@ -1,4 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import axios from 'axios';
+import styled from 'styled-components';
 import './App.css';
 import Directory from './Directory';
 import Statistique from './Statistique';
@@ -17,28 +19,18 @@ type ApiResponse = {
 };
 
 function App() {
-  const [apiData, setApiData] = useState<ApiResponse | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-
-  const fetchFromSymfony = async (): Promise<void> => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await fetch('/api/hello');
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      const data: ApiResponse = await response.json();
-      setApiData(data);
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Unexpected error');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchFromSymfony();
-  }, []);
+  const {
+    data: apiData,
+    error,
+    isFetching,
+    refetch,
+  } = useQuery<ApiResponse, Error>({
+    queryKey: ['api-hello'],
+    queryFn: async () => {
+      const { data } = await axios.get<ApiResponse>('/api/hello');
+      return data;
+    },
+  });
 
   return (
     <div className="App">
@@ -50,8 +42,8 @@ function App() {
 
         <div className="api-box">
           <h2>Symfony API Response</h2>
-          {loading && <p>Loading…</p>}
-          {error && <p className="error">Error: {error}</p>}
+          {isFetching && <p>Loading…</p>}
+          {error && <p className="error">Error: {error.message}</p>}
           {apiData && (
             <>
               <ul>
@@ -60,27 +52,27 @@ function App() {
                 <li><strong>Timestamp:</strong> {apiData.timestamp}</li>
               </ul>
               <h3>Products from DB</h3>
-              <table style={{width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem'}}>
+              <DataTable>
                 <thead>
                   <tr>
-                    <th style={{textAlign: 'left', borderBottom: '1px solid #61dafb', paddingBottom: '0.3rem'}}>ID</th>
-                    <th style={{textAlign: 'left', borderBottom: '1px solid #61dafb', paddingBottom: '0.3rem'}}>Name</th>
-                    <th style={{textAlign: 'right', borderBottom: '1px solid #61dafb', paddingBottom: '0.3rem'}}>Price</th>
+                    <HeaderCell>ID</HeaderCell>
+                    <HeaderCell>Name</HeaderCell>
+                    <HeaderCellRight>Price</HeaderCellRight>
                   </tr>
                 </thead>
                 <tbody>
                   {apiData.products.map((p) => (
                     <tr key={p.id}>
-                      <td style={{padding: '0.2rem 0'}}>{p.id}</td>
-                      <td>{p.name}</td>
-                      <td style={{textAlign: 'right'}}>${p.price}</td>
+                      <Cell>{p.id}</Cell>
+                      <Cell>{p.name}</Cell>
+                      <CellRight>${p.price}</CellRight>
                     </tr>
                   ))}
                 </tbody>
-              </table>
+              </DataTable>
             </>
           )}
-          <button onClick={fetchFromSymfony} disabled={loading}>
+          <button onClick={() => refetch()} disabled={isFetching}>
             Refresh
           </button>
         </div>
@@ -91,5 +83,29 @@ function App() {
     </div>
   );
 }
+
+const DataTable = styled.table`
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+`;
+
+const HeaderCell = styled.th`
+  text-align: left;
+  border-bottom: 1px solid #61dafb;
+  padding-bottom: 0.3rem;
+`;
+
+const HeaderCellRight = styled(HeaderCell)`
+  text-align: right;
+`;
+
+const Cell = styled.td`
+  padding: 0.2rem 0;
+`;
+
+const CellRight = styled(Cell)`
+  text-align: right;
+`;
 
 export default App;

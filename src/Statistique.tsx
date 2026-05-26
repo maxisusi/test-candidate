@@ -1,4 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import axios from 'axios';
+import styled from 'styled-components';
 
 type DepartmentStat = {
   department: string;
@@ -6,59 +8,75 @@ type DepartmentStat = {
 };
 
 function Statistique() {
-  const [stats, setStats] = useState<DepartmentStat[]>([]);
-
-  useEffect(() => {
-    const controller = new AbortController();
-    (async () => {
-      try {
-        const response = await fetch('/api/directory/stats', { signal: controller.signal });
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        const data: DepartmentStat[] = await response.json();
-        setStats(data);
-      } catch (err: unknown) {
-        if ((err as Error).name === 'AbortError') return;
-      }
-    })();
-    return () => controller.abort();
-  }, []);
+  const {
+    data: stats = [],
+    isFetching,
+  } = useQuery<DepartmentStat[]>({
+    queryKey: ['directory-stats'],
+    queryFn: async () => {
+      const { data } = await axios.get<DepartmentStat[]>('/api/directory/stats');
+      return data;
+    },
+  });
 
   return (
     <div className="api-box">
       <h2>Statistiques</h2>
-      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
+      {isFetching && <p>Loading…</p>}
+      <StatsTable>
         <thead>
           <tr>
-            <th style={th}>Département</th>
-            <th style={{ ...th, textAlign: 'right' }}>Nb employés</th>
+            <HeaderCell>Département</HeaderCell>
+            <HeaderCellRight>Nb employés</HeaderCellRight>
           </tr>
         </thead>
         <tbody>
           {stats.map((s) => (
             <tr key={s.department}>
-              <td style={td}>{s.department}</td>
-              <td style={{ ...td, textAlign: 'right' }}>{s.count}</td>
+              <Cell>{s.department}</Cell>
+              <CellRight>{s.count}</CellRight>
             </tr>
           ))}
           {stats.length === 0 && (
             <tr>
-              <td colSpan={2} style={{ ...td, textAlign: 'center', opacity: 0.7 }}>
+              <EmptyCell colSpan={2}>
                 Aucun département
-              </td>
+              </EmptyCell>
             </tr>
           )}
         </tbody>
-      </table>
+      </StatsTable>
     </div>
   );
 }
 
-const th: React.CSSProperties = {
-  textAlign: 'left',
-  borderBottom: '1px solid #61dafb',
-  paddingBottom: '0.3rem',
-};
+const StatsTable = styled.table`
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+`;
 
-const td: React.CSSProperties = { padding: '0.2rem 0' };
+const HeaderCell = styled.th`
+  text-align: left;
+  border-bottom: 1px solid #61dafb;
+  padding-bottom: 0.3rem;
+`;
+
+const HeaderCellRight = styled(HeaderCell)`
+  text-align: right;
+`;
+
+const Cell = styled.td`
+  padding: 0.2rem 0;
+`;
+
+const CellRight = styled(Cell)`
+  text-align: right;
+`;
+
+const EmptyCell = styled(Cell)`
+  text-align: center;
+  opacity: 0.7;
+`;
 
 export default Statistique;

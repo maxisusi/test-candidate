@@ -1,4 +1,7 @@
 import { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import axios from 'axios';
+import styled from 'styled-components';
 
 type Employee = {
   id: number;
@@ -9,101 +12,112 @@ type Employee = {
 };
 
 function Directory() {
-  const [employees, setEmployees] = useState<Employee[]>([]);
   const [search, setSearch] = useState('');
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [debouncedSearch, setDebouncedSearch] = useState('');
 
   useEffect(() => {
-    const controller = new AbortController();
-    const timeout = setTimeout(async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const url = search
-          ? `/api/directory?search=${encodeURIComponent(search)}`
-          : '/api/directory';
-        const response = await fetch(url, { signal: controller.signal });
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        const data: Employee[] = await response.json();
-        setEmployees(data);
-      } catch (err: unknown) {
-        if ((err as Error).name === 'AbortError') return;
-        setError(err instanceof Error ? err.message : 'Unexpected error');
-      } finally {
-        setLoading(false);
-      }
+    const timeout = setTimeout(() => {
+      setDebouncedSearch(search);
     }, 250);
 
     return () => {
-      controller.abort();
       clearTimeout(timeout);
     };
   }, [search]);
+
+  const {
+    data: employees = [],
+    error,
+    isFetching,
+  } = useQuery<Employee[], Error>({
+    queryKey: ['directory', debouncedSearch],
+    queryFn: async () => {
+      const url = debouncedSearch
+        ? `/api/directory?search=${encodeURIComponent(debouncedSearch)}`
+        : '/api/directory';
+      const { data } = await axios.get<Employee[]>(url);
+      return data;
+    },
+    placeholderData: (previousData) => previousData,
+  });
 
   return (
     <div className="api-box">
       <h2>Annuaire</h2>
 
-      <input
+      <SearchInput
         type="search"
         placeholder="Rechercher un employé…"
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-        style={{
-          width: '100%',
-          padding: '0.4rem 0.6rem',
-          marginBottom: '0.8rem',
-          fontSize: '0.9rem',
-          borderRadius: 4,
-          border: '1px solid #61dafb',
-          background: 'transparent',
-          color: 'inherit',
-        }}
       />
 
-      {loading && <p>Loading…</p>}
-      {error && <p className="error">Error: {error}</p>}
+      {isFetching && <p>Loading…</p>}
+      {error && <p className="error">Error: {error.message}</p>}
 
-      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
+      <DirectoryTable>
         <thead>
           <tr>
-            <th style={th}>ID</th>
-            <th style={th}>Prénom</th>
-            <th style={th}>Nom</th>
-            <th style={th}>Département</th>
-            <th style={th}>Manager</th>
+            <HeaderCell>ID</HeaderCell>
+            <HeaderCell>Prénom</HeaderCell>
+            <HeaderCell>Nom</HeaderCell>
+            <HeaderCell>Département</HeaderCell>
+            <HeaderCell>Manager</HeaderCell>
           </tr>
         </thead>
         <tbody>
           {employees.map((e) => (
             <tr key={e.id}>
-              <td style={td}>{e.id}</td>
-              <td style={td}>{e.firstName}</td>
-              <td style={td}>{e.lastName}</td>
-              <td style={td}>{e.department}</td>
-              <td style={td}>{e.manager ?? '—'}</td>
+              <Cell>{e.id}</Cell>
+              <Cell>{e.firstName}</Cell>
+              <Cell>{e.lastName}</Cell>
+              <Cell>{e.department}</Cell>
+              <Cell>{e.manager ?? '—'}</Cell>
             </tr>
           ))}
-          {!loading && employees.length === 0 && (
+          {!isFetching && employees.length === 0 && (
             <tr>
-              <td colSpan={5} style={{ ...td, textAlign: 'center', opacity: 0.7 }}>
+              <EmptyCell colSpan={5}>
                 No employees found
-              </td>
+              </EmptyCell>
             </tr>
           )}
         </tbody>
-      </table>
+      </DirectoryTable>
     </div>
   );
 }
 
-const th: React.CSSProperties = {
-  textAlign: 'left',
-  borderBottom: '1px solid #61dafb',
-  paddingBottom: '0.3rem',
-};
+const SearchInput = styled.input`
+  width: 100%;
+  padding: 0.4rem 0.6rem;
+  margin-bottom: 0.8rem;
+  font-size: 0.9rem;
+  border-radius: 4px;
+  border: 1px solid #61dafb;
+  background: transparent;
+  color: inherit;
+`;
 
-const td: React.CSSProperties = { padding: '0.2rem 0' };
+const DirectoryTable = styled.table`
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+`;
+
+const HeaderCell = styled.th`
+  text-align: left;
+  border-bottom: 1px solid #61dafb;
+  padding-bottom: 0.3rem;
+`;
+
+const Cell = styled.td`
+  padding: 0.2rem 0;
+`;
+
+const EmptyCell = styled(Cell)`
+  text-align: center;
+  opacity: 0.7;
+`;
 
 export default Directory;
