@@ -18,7 +18,7 @@ type ApiResponse = {
   products: Product[];
 };
 
-function App() {
+const App = () => {
   const {
     data: apiData,
     error,
@@ -82,7 +82,7 @@ function App() {
       </header>
     </div>
   );
-}
+};
 
 const DataTable = styled.table`
   width: 100%;

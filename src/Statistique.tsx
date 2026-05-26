@@ -7,7 +7,7 @@ type DepartmentStat = {
   count: number;
 };
 
-function Statistique() {
+const Statistique = () => {
   const {
     data: stats = [],
     isFetching,
@@ -48,7 +48,7 @@ function Statistique() {
       </StatsTable>
     </div>
   );
-}
+};
 
 const StatsTable = styled.table`
   width: 100%;

@@ -11,7 +11,7 @@ type Employee = {
   manager: string | null;
 };
 
-function Directory() {
+const Directory = () => {
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
 
@@ -86,7 +86,7 @@ function Directory() {
       </DirectoryTable>
     </div>
   );
-}
+};
 
 const SearchInput = styled.input`
   width: 100%;
