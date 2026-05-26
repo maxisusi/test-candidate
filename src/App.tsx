@@ -1,16 +1,17 @@
 import { NavLink, Route, Routes } from 'react-router-dom';
 import styled from 'styled-components';
-import { Directory } from './Directory';
-import { Statistique } from './Statistique';
+import { Directory } from './pages/Directory';
+import { Statistics } from './pages/Statistics';
+import { translation } from './translations/translation';
 
 export const App = () => (
   <Layout>
     <NavBar>
       <Inner>
-        <AppTitle>Annuaire RH</AppTitle>
+        <AppTitle>{translation.app.title}</AppTitle>
         <TabList>
-          <TabLink to="/" end>Annuaire</TabLink>
-          <TabLink to="/stats">Statistiques</TabLink>
+          <TabLink to="/" end>{translation.app.tabs.directory}</TabLink>
+          <TabLink to="/stats">{translation.app.tabs.statistics}</TabLink>
         </TabList>
       </Inner>
     </NavBar>
@@ -18,7 +19,7 @@ export const App = () => (
       <Inner>
         <Routes>
           <Route path="/" element={<Directory />} />
-          <Route path="/stats" element={<Statistique />} />
+        <Route path="/stats" element={<Statistics />} />
         </Routes>
       </Inner>
     </Main>

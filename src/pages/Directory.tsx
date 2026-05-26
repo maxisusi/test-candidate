@@ -1,25 +1,20 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import styled from 'styled-components';
-import { directory } from './api/services';
-import type { Employee } from './api/types';
-import SkeletonBar from './components/Skeleton';
+import { directory } from '../api/services';
+import type { Employee } from '../api/types';
+import SkeletonBar from '../components/Skeleton';
+import { Card, CardTitle, HeaderCell, Cell, DataRow, EmptyCell } from '../components/Table';
+import { useDebounceValue } from '../hooks/useDebounceValue';
+import { translation } from '../translations/translation';
 
+const DEBOUNCE_DELAY_MS = 250;
 const SKELETON_ROWS = 6;
 
 export const Directory = () => {
+  const t = translation.directory;
   const [search, setSearch] = useState('');
-  const [debouncedSearch, setDebouncedSearch] = useState('');
-
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      setDebouncedSearch(search);
-    }, 250);
-
-    return () => {
-      clearTimeout(timeout);
-    };
-  }, [search]);
+  const debouncedSearch = useDebounceValue(search, DEBOUNCE_DELAY_MS);
 
   const {
     data: employees = [],
@@ -33,25 +28,25 @@ export const Directory = () => {
 
   return (
     <Card>
-      <CardTitle>Annuaire</CardTitle>
+      <CardTitle>{t.title}</CardTitle>
 
       <SearchInput
         type="search"
-        placeholder="Rechercher un employé…"
+        placeholder={t.searchPlaceholder}
         value={search}
         onChange={(e) => setSearch(e.target.value)}
       />
 
-      {error && <ErrorText>Erreur : {error.message}</ErrorText>}
+      {error && <ErrorText>{translation.common.errorPrefix} {error.message}</ErrorText>}
 
       <DirectoryTable>
         <thead>
           <tr>
-            <HeaderCell>ID</HeaderCell>
-            <HeaderCell>Prénom</HeaderCell>
-            <HeaderCell>Nom</HeaderCell>
-            <HeaderCell>Département</HeaderCell>
-            <HeaderCell>Manager</HeaderCell>
+            <HeaderCell>{t.columns.id}</HeaderCell>
+            <HeaderCell>{t.columns.firstName}</HeaderCell>
+            <HeaderCell>{t.columns.lastName}</HeaderCell>
+            <HeaderCell>{t.columns.department}</HeaderCell>
+            <HeaderCell>{t.columns.manager}</HeaderCell>
           </tr>
         </thead>
         <tbody>
@@ -70,12 +65,12 @@ export const Directory = () => {
                     <Cell>{e.firstName}</Cell>
                     <Cell>{e.lastName}</Cell>
                     <Cell>{e.department}</Cell>
-                    <Cell>{e.manager ?? '—'}</Cell>
+                    <Cell>{e.manager ?? translation.common.emptyValue}</Cell>
                   </DataRow>
                 ))
               : (
                   <tr>
-                    <EmptyCell colSpan={5}>Aucun employé trouvé</EmptyCell>
+                    <EmptyCell colSpan={5}>{t.empty}</EmptyCell>
                   </tr>
                 )
           }
@@ -85,19 +80,10 @@ export const Directory = () => {
   );
 };
 
-const Card = styled.div`
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  padding: 1.75rem 2rem;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
-`;
-
-const CardTitle = styled.h2`
-  margin: 0 0 1.25rem;
-  font-size: 1.15rem;
-  font-weight: 700;
-  color: #1e293b;
+const DirectoryTable = styled.table`
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
 `;
 
 const SearchInput = styled.input`
@@ -122,48 +108,6 @@ const ErrorText = styled.p`
   color: #dc2626;
   font-size: 0.875rem;
   margin-bottom: 1rem;
-`;
-
-const DirectoryTable = styled.table`
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.875rem;
-`;
-
-const HeaderCell = styled.th`
-  text-align: left;
-  padding: 0.6rem 0.75rem;
-  background: #f8fafc;
-  border-bottom: 2px solid #e2e8f0;
-  color: #64748b;
-  font-weight: 600;
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-`;
-
-const Cell = styled.td`
-  padding: 0.7rem 0.75rem;
-  color: #1e293b;
-  border-bottom: 1px solid #f1f5f9;
-`;
-
-const DataRow = styled.tr`
-  transition: background 0.1s;
-
-  &:hover {
-    background: #f8fafc;
-  }
-
-  &:last-child td {
-    border-bottom: none;
-  }
-`;
-
-const EmptyCell = styled(Cell)`
-  text-align: center;
-  color: #94a3b8;
-  padding: 2rem;
 `;
 
 
