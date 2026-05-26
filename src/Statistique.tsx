@@ -9,7 +9,7 @@ const SKELETON_ROWS = 4;
 export const Statistique = () => {
   const {
     data: stats = [],
-    isFetching,
+    isLoading,
   } = useQuery<DepartmentStat[]>({
     queryKey: ['directory-stats'],
     queryFn: department.getStats,
@@ -26,7 +26,7 @@ export const Statistique = () => {
           </tr>
         </thead>
         <tbody>
-          {isFetching
+          {isLoading
             ? Array.from({ length: SKELETON_ROWS }).map((_, i) => (
                 <tr key={i}>
                   <Cell><SkeletonBar width="60%" /></Cell>

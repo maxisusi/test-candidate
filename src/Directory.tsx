@@ -24,7 +24,7 @@ export const Directory = () => {
   const {
     data: employees = [],
     error,
-    isFetching,
+    isLoading,
   } = useQuery<Employee[], Error>({
     queryKey: ['directory', debouncedSearch],
     queryFn: () => directory.getAll(debouncedSearch || undefined),
@@ -55,7 +55,7 @@ export const Directory = () => {
           </tr>
         </thead>
         <tbody>
-          {isFetching
+          {isLoading
             ? Array.from({ length: SKELETON_ROWS }).map((_, i) => (
                 <tr key={i}>
                   {Array.from({ length: 5 }).map((_, j) => (
