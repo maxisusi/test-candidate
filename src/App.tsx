@@ -1,90 +1,123 @@
-import { useEffect, useState } from 'react';
-import './App.css';
+import { NavLink, Route, Routes } from 'react-router-dom';
+import styled from 'styled-components';
+import { Directory } from './pages/Directory';
+import { Statistics } from './pages/Statistics';
+import { translation } from './translations/translation';
 
-type Product = {
-  id: number;
-  name: string;
-  price: number;
-};
+export const App = () => (
+  <Layout>
+    <NavBar>
+      <NavInner>
+        <AppTitle>{translation.app.title}</AppTitle>
+        <TabList>
+          <TabLink to="/" end>{translation.app.tabs.directory}</TabLink>
+          <TabLink to="/stats">{translation.app.tabs.statistics}</TabLink>
+        </TabList>
+        <UserInfo>
+          <Avatar>D</Avatar>
+          <UserName>David</UserName>
+        </UserInfo>
+      </NavInner>
+    </NavBar>
+    <Main>
+      <Inner>
+        <Routes>
+          <Route path="/" element={<Directory />} />
+        <Route path="/stats" element={<Statistics />} />
+        </Routes>
+      </Inner>
+    </Main>
+  </Layout>
+);
 
-type ApiResponse = {
-  message: string;
-  version: string;
-  timestamp: string;
-  products: Product[];
-};
+const Layout = styled.div`
+  min-height: 100vh;
+  background-color: #f1f5f9;
+  color: #1e293b;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+`;
 
-function App() {
-  const [apiData, setApiData] = useState<ApiResponse | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+const NavBar = styled.header`
+  background: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+`;
 
-  const fetchFromSymfony = async (): Promise<void> => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await fetch('/api/hello');
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      const data: ApiResponse = await response.json();
-      setApiData(data);
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Unexpected error');
-    } finally {
-      setLoading(false);
-    }
-  };
+const NavInner = styled.div`
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+`;
 
-  useEffect(() => {
-    fetchFromSymfony();
-  }, []);
+const Inner = styled.div`
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+`;
 
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src="Octocat.png" className="App-logo" alt="logo" />
-        <p>
-          GitHub Codespaces <span className="heart">♥️</span> React + Symfony
-        </p>
+const AppTitle = styled.span`
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-right: 2rem;
+`;
 
-        <div className="api-box">
-          <h2>Symfony API Response</h2>
-          {loading && <p>Loading…</p>}
-          {error && <p className="error">Error: {error}</p>}
-          {apiData && (
-            <>
-              <ul>
-                <li><strong>Message:</strong> {apiData.message}</li>
-                <li><strong>Symfony version:</strong> {apiData.version}</li>
-                <li><strong>Timestamp:</strong> {apiData.timestamp}</li>
-              </ul>
-              <h3>Products from DB</h3>
-              <table style={{width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem'}}>
-                <thead>
-                  <tr>
-                    <th style={{textAlign: 'left', borderBottom: '1px solid #61dafb', paddingBottom: '0.3rem'}}>ID</th>
-                    <th style={{textAlign: 'left', borderBottom: '1px solid #61dafb', paddingBottom: '0.3rem'}}>Name</th>
-                    <th style={{textAlign: 'right', borderBottom: '1px solid #61dafb', paddingBottom: '0.3rem'}}>Price</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {apiData.products.map((p) => (
-                    <tr key={p.id}>
-                      <td style={{padding: '0.2rem 0'}}>{p.id}</td>
-                      <td>{p.name}</td>
-                      <td style={{textAlign: 'right'}}>${p.price}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </>
-          )}
-          <button onClick={fetchFromSymfony} disabled={loading}>
-            Refresh
-          </button>
-        </div>
-      </header>
-    </div>
-  );
-}
+const TabList = styled.div`
+  display: inline-flex;
+  gap: 0.25rem;
+`;
 
-export default App;
+const TabLink = styled(NavLink)`
+  display: inline-block;
+  padding: 1rem 1.25rem;
+  text-decoration: none;
+  color: #64748b;
+  font-size: 0.9rem;
+  font-weight: 500;
+  border-bottom: 2px solid transparent;
+  transition: color 0.15s, border-color 0.15s;
+
+  &:hover {
+    color: #1e293b;
+  }
+
+  &.active {
+    color: #2563eb;
+    border-bottom-color: #2563eb;
+    font-weight: 600;
+  }
+`;
+
+const Main = styled.main`
+  padding: 2rem 0;
+`;
+
+const UserInfo = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+`;
+
+const Avatar = styled.div`
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background: #2563eb;
+  color: #ffffff;
+  font-size: 0.85rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const UserName = styled.span`
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #1e293b;
+`;
+
+
