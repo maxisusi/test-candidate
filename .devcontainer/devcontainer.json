@@ -15,6 +15,11 @@
       "openFiles": [
         "src/App.tsx"
       ]
+    },
+    "vscode": {
+      "extensions": [
+        "bmewburn.vscode-intelephense-client"
+      ]
     }
   },
   "portsAttributes": {
@@ -27,5 +32,8 @@
       "onAutoForward": "openPreview"
     }
   },
-  "forwardPorts": [3000, 8000]
+  "forwardPorts": [
+    3000,
+    8000
+  ]
 }
