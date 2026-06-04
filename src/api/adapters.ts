@@ -20,9 +20,9 @@ export const adaptEmployee = (raw: RawEmployee): Employee => ({
   id: raw.id,
   firstName: raw.firstName.trim(),
   lastName: raw.lastName.trim(),
-  department: raw.department?.trim() ?? null,
+  // department: raw.department.trim(),   // TODO: Implement when back is ready
   manager: raw.manager?.trim() ?? null,
-});
+}) as Employee;
 
 /**
  * Adapts an array of raw employees from the API response.
