@@ -28,3 +28,4 @@ fi
 cd backend
 composer install --no-interaction --no-progress
 php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration
+php bin/console doctrine:fixtures:load --no-interaction
