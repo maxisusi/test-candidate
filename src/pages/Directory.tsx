@@ -93,8 +93,8 @@ export const Directory = () => {
                     <Cell>{e.id}</Cell>
                     <Cell>{e.firstName}</Cell>
                     <Cell>{e.lastName}</Cell>
-                    <Cell>{e.department ?? translation.common.emptyValue}</Cell>
-                    <Cell>{e.manager ?? translation.common.emptyValue}</Cell>
+                    <Cell>{e.department}</Cell>
+                    <Cell>{e.manager}</Cell>
                   </DataRow>
                 ))
               : (
