@@ -8,7 +8,7 @@ export type RawEmployee = {
   id: number;
   firstName: string;
   lastName: string;
-  department: string;
+  department: string | null | undefined;
   manager: string | null | undefined;
 };
 
