@@ -17,6 +17,11 @@
       ]
     },
     "vscode": {
+      "settings": {
+        "github.copilot.enable": {
+          "*": false
+        }
+      },
       "extensions": [
         "bmewburn.vscode-intelephense-client"
       ]
