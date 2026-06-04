@@ -28,7 +28,7 @@ final class Version20260522112045 extends AbstractMigration
                 id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
                 first_name VARCHAR(255) NOT NULL,
                 last_name VARCHAR(255) NOT NULL,
-                department_id INTEGER NOT NULL,
+                department_id INTEGER DEFAULT NULL,
                 manager_id INTEGER DEFAULT NULL,
                 CONSTRAINT FK_employees_department FOREIGN KEY (department_id) REFERENCES departments (id) NOT DEFERRABLE INITIALLY IMMEDIATE,
                 CONSTRAINT FK_employees_manager FOREIGN KEY (manager_id) REFERENCES employees (id) NOT DEFERRABLE INITIALLY IMMEDIATE

@@ -39,7 +39,7 @@ export const Statistics = () => {
             : stats.length > 0
               ? stats.map((s) => (
                   <DataRow key={s.department}>
-                    <Cell>{s.department}</Cell>
+                    <Cell>{s.department ?? 'Sans département'}</Cell>
                     <CellRight>
                       <Badge>{s.count}</Badge>
                     </CellRight>

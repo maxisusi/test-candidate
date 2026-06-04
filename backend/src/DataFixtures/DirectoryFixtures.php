@@ -22,6 +22,7 @@ class DirectoryFixtures extends Fixture
         $alice = new Employee('Alice', 'Martin', $engineering);
         $bob = new Employee('Bob', 'Dupont', $engineering);
         $carol = new Employee('Carol', 'Nguyen', $engineering);
+        $john = new Employee('John', 'Doe', null);
         $bob->setManager($alice);
         $carol->setManager($alice);
 
@@ -31,7 +32,7 @@ class DirectoryFixtures extends Fixture
 
         $frank = new Employee('Frank', 'Bianchi', $hr);
 
-        foreach ([$alice, $bob, $carol, $david, $eve, $frank] as $employee) {
+        foreach ([$alice, $bob, $carol, $john, $david, $eve, $frank] as $employee) {
             $manager->persist($employee);
         }
 

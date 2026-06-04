@@ -1,0 +1,138 @@
+diff --git a/backend/migrations/Version20260522112045.php b/backend/migrations/Version20260522112045.php
+index a7169d6..790fdf7 100644
+--- a/backend/migrations/Version20260522112045.php
++++ b/backend/migrations/Version20260522112045.php
+@@ -28,7 +28,7 @@ final class Version20260522112045 extends AbstractMigration
+                 id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                 first_name VARCHAR(255) NOT NULL,
+                 last_name VARCHAR(255) NOT NULL,
+-                department_id INTEGER NOT NULL,
++                department_id INTEGER DEFAULT NULL,
+                 manager_id INTEGER DEFAULT NULL,
+                 CONSTRAINT FK_employees_department FOREIGN KEY (department_id) REFERENCES departments (id) NOT DEFERRABLE INITIALLY IMMEDIATE,
+                 CONSTRAINT FK_employees_manager FOREIGN KEY (manager_id) REFERENCES employees (id) NOT DEFERRABLE INITIALLY IMMEDIATE
+diff --git a/backend/src/Controller/DirectoryController.php b/backend/src/Controller/DirectoryController.php
+index c2adcdc..764ff9f 100644
+--- a/backend/src/Controller/DirectoryController.php
++++ b/backend/src/Controller/DirectoryController.php
+@@ -14,19 +14,22 @@ class DirectoryController extends AbstractController
+     public function list(Request $request, EmployeeRepository $repo): JsonResponse
+     {
+         $search = $request->query->get('search');
+-        $employees = $repo->findAll();
++        $employees = $repo->createQueryBuilder('e')->select('e')->where('e.lastName LIKE :search')->orwhere('e.firstName LIKE :search')
++            ->setParameter('search', '%' . $search . '%')
++            ->getQuery()
++            ->getResult();
+ 
+         $result = [];
+         foreach ($employees as $employee) {
+-            if ($search && stripos($employee->getLastName(), $search) === false) {
+-                continue;
+-            }
++            //if ($search && stripos($employee->getLastName(), $search) === false) {
++            //    continue;
++            //}
+ 
+             $result[] = [
+                 'id' => $employee->getId(),
+                 'firstName' => $employee->getFirstName(),
+                 'lastName' => $employee->getLastName(),
+-                'department' => $employee->getDepartment()->getName(),
++                'department' => $employee->getDepartment()?->getName(),
+                 'manager' => $employee->getManager()
+                     ? $employee->getManager()->getFirstName() . ' ' . $employee->getManager()->getLastName()
+                     : null,
+@@ -39,6 +42,13 @@ class DirectoryController extends AbstractController
+     #[Route('/api/directory/stats', methods: ['GET'])]
+     public function stats(EmployeeRepository $repo): JsonResponse
+     {
+-        return new JsonResponse([]);
++        $result = $repo->createQueryBuilder('e')
++            ->select('d.name AS department, COUNT(e.id) AS employeeCount')
++            ->leftJoin('e.department', 'd')
++            ->groupBy('d.id')
++            ->getQuery()
++            ->getResult();
++
++        return new JsonResponse($result);
+     }
+ }
+diff --git a/backend/src/DataFixtures/DirectoryFixtures.php b/backend/src/DataFixtures/DirectoryFixtures.php
+index 305f91f..6166ebb 100644
+--- a/backend/src/DataFixtures/DirectoryFixtures.php
++++ b/backend/src/DataFixtures/DirectoryFixtures.php
+@@ -22,6 +22,7 @@ class DirectoryFixtures extends Fixture
+         $alice = new Employee('Alice', 'Martin', $engineering);
+         $bob = new Employee('Bob', 'Dupont', $engineering);
+         $carol = new Employee('Carol', 'Nguyen', $engineering);
++        $john = new Employee('John', 'Doe', null);
+         $bob->setManager($alice);
+         $carol->setManager($alice);
+ 
+@@ -31,7 +32,7 @@ class DirectoryFixtures extends Fixture
+ 
+         $frank = new Employee('Frank', 'Bianchi', $hr);
+ 
+-        foreach ([$alice, $bob, $carol, $david, $eve, $frank] as $employee) {
++        foreach ([$alice, $bob, $carol, $john, $david, $eve, $frank] as $employee) {
+             $manager->persist($employee);
+         }
+ 
+diff --git a/backend/src/Entity/Employee.php b/backend/src/Entity/Employee.php
+index 9dd79d4..2577e6c 100644
+--- a/backend/src/Entity/Employee.php
++++ b/backend/src/Entity/Employee.php
+@@ -19,25 +19,43 @@ class Employee
+     private string $lastName;
+ 
+     #[ORM\ManyToOne(targetEntity: Department::class, fetch: 'LAZY')]
+-    #[ORM\JoinColumn(nullable: false)]
+-    private Department $department;
++    #[ORM\JoinColumn(nullable: true)]
++    private ?Department $department;
+ 
+     #[ORM\ManyToOne(targetEntity: Employee::class, fetch: 'LAZY')]
+     #[ORM\JoinColumn(nullable: true)]
+     private ?Employee $manager = null;
+ 
+-    public function __construct(string $firstName, string $lastName, Department $department)
++    public function __construct(string $firstName, string $lastName, ?Department $department)
+     {
+         $this->firstName = $firstName;
+         $this->lastName = $lastName;
+         $this->department = $department;
+     }
+ 
+-    public function getId(): int { return $this->id; }
+-    public function getFirstName(): string { return $this->firstName; }
+-    public function getLastName(): string { return $this->lastName; }
+-    public function getDepartment(): Department { return $this->department; }
+-    public function getManager(): ?Employee { return $this->manager; }
++    public function getId(): int
++    {
++        return $this->id;
++    }
++    public function getFirstName(): string
++    {
++        return $this->firstName;
++    }
++    public function getLastName(): string
++    {
++        return $this->lastName;
++    }
++    public function getDepartment(): ?Department
++    {
++        return $this->department;
++    }
++    public function getManager(): ?Employee
++    {
++        return $this->manager;
++    }
+ 
+-    public function setManager(?Employee $manager): void { $this->manager = $manager; }
++    public function setManager(?Employee $manager): void
++    {
++        $this->manager = $manager;
++    }
+ }

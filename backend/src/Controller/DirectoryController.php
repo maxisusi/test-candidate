@@ -26,7 +26,7 @@ class DirectoryController extends AbstractController
                 'id' => $employee->getId(),
                 'firstName' => $employee->getFirstName(),
                 'lastName' => $employee->getLastName(),
-                'department' => $employee->getDepartment()->getName(),
+                'department' => $employee->getDepartment()?->getName(),
                 'manager' => $employee->getManager()
                     ? $employee->getManager()->getFirstName() . ' ' . $employee->getManager()->getLastName()
                     : null,
